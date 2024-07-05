@@ -15,7 +15,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.6.0</version>
                 <configuration>
-                    <mainClass>com.practice.Main</mainClass>
+                    <mainClass>com.rutils.HClient</mainClass>
                 </configuration>
             </plugin>
             <plugin>
@@ -24,7 +24,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.practice.Main</mainClass>
+                            <mainClass>com.rutils.HClient</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -47,10 +47,20 @@
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+        <javafx.version>21</javafx.version>
     </properties>
 
     <dependencies>
-        
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

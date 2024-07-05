@@ -11,12 +11,12 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
 
-public class Main{
-    public static void main(String[] args){
+public class Https{
+    public static void test(){
         
         try{
             KeyStore keyStore = KeyStore.getInstance("PKCS12");
-            keyStore.load(Main.class.getClassLoader().getResourceAsStream("ksclient.p12"), "ksclient7548".toCharArray());
+            keyStore.load(Https.class.getClassLoader().getResourceAsStream("ksclient.p12"), "ksclient7548".toCharArray());
 
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             tmf.init(keyStore);
