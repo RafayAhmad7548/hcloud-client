@@ -2,11 +2,9 @@ package com.rutils;
 
 import java.io.File;
 import java.net.MalformedURLException;
-
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -23,8 +21,10 @@ public class HClient extends Application{
 
     static Scene loginScene;
     static Scene registerScene;
+    static Scene mainScene;
 
     public static void main(String[] args){
+        HttpsUtil.init();
         launch(args);
     }
 
@@ -51,21 +51,62 @@ public class HClient extends Application{
         stage.show();
     }
 
-    EventHandler<ActionEvent> handleLogin = new EventHandler<ActionEvent>(){
-        @Override
-        public void handle(ActionEvent event){
-            
+    private void handleLogin(TextField username, PasswordField password, Label info){
+        int verified = HttpsUtil.verifyCredentials(username.getText(), password.getText());
+        resetStyles(username, password, info);
+        switch(verified){
+            case 0: // user not registered
+                username.setStyle("-fx-border-color: red;");
+                info.setText("user not registered");
+                info.setStyle("-fx-text-fill: red;");
+            break;
+            case 1: // succesful verification
+                username.setStyle("");
+                password.setStyle("");
+                info.setStyle("");
+                info.setText("success");
+                info.setStyle("-fx-text-fill: green;");
+            break;
+            case 2: // incorrect passwd
+                username.setStyle("");
+                password.setStyle("-fx-border-color: red;");
+                info.setStyle("");
+                info.setText("incorrect password");
+                info.setStyle("-fx-text-fill: red;");
         }
         
-    };
+    }
 
-    EventHandler<ActionEvent> handleRegister = new EventHandler<ActionEvent>(){
-        @Override
-        public void handle(ActionEvent event){
-
+    private void handleRegister(TextField username, PasswordField password, PasswordField passwordAgain, Label info){
+        int status = HttpsUtil.registerUser(username.getText(), password.getText(), passwordAgain.getText());       
+        resetStyles(username, password, passwordAgain, info);
+        System.out.println(status);
+        switch(status){
+            case 0: // password not match
+                password.setStyle("-fx-border-color: red;");
+                passwordAgain.setStyle("-fx-border-color: red;");
+                info.setText("passwords do not match");
+                info.setStyle("-fx-text-fill: red;");
+            break;
+            case 1: // registered succesfully
+                info.setText("registered successfully");
+                info.setStyle("-fx-text-fill: green;");
+                password.setStyle("-fx-border-color: #222222;");
+                passwordAgain.setStyle("-fx-border-color: #222222;");
+            break;
+            case 2:
+                // user already exists
+                info.setText("user already registered");
+                info.setStyle("-fx-text-fill: red;");
+                username.setStyle("-fx-border-color: red;");
         }
-        
-    };
+    }
+
+    private void resetStyles(Node... nodes){
+        for(Node node : nodes){
+            node.setStyle(null);
+        }
+    }
 
     private Scene createLoginScene(){
         VBox root = new VBox();
@@ -95,14 +136,14 @@ public class HClient extends Application{
         password.maxWidthProperty().bind(scene.widthProperty().divide(3));
         password.setPrefHeight(50);
 
-        Region spcr2 = new Region();
-        spcr1.setPrefHeight(20);
+        Label info = new Label();
+        info.setPrefHeight(20);
 
         Button login = new Button("Login");
         login.setFont(new Font(20));
         login.maxWidthProperty().bind(scene.widthProperty().divide(3));
         login.setPrefHeight(50);
-        login.setOnAction(handleLogin);
+        login.setOnAction(e -> handleLogin(username, password, info));
 
         Label or = new Label("OR");
         or.setFont(new Font(30));
@@ -113,7 +154,7 @@ public class HClient extends Application{
         signup.setPrefHeight(50);
         signup.setOnAction(e -> stage.setScene(registerScene));
 
-        root.getChildren().addAll(label, spcr1, username, password, spcr2, login, or, signup);
+        root.getChildren().addAll(label, spcr1, username, password, info, login, or, signup);
         return scene;
     }
 
@@ -151,14 +192,15 @@ public class HClient extends Application{
         passwordAgain.maxWidthProperty().bind(scene.widthProperty().divide(3));
         passwordAgain.setPrefHeight(50);
 
-        Region spcr2 = new Region();
-        spcr1.setPrefHeight(20);
+        Label info = new Label();
+        info.setPrefHeight(20);
+        info.setStyle("-fx-text-fill: red;");
 
         Button signup = new Button("Sign Up");
         signup.setFont(new Font(20));
         signup.maxWidthProperty().bind(scene.widthProperty().divide(3));
         signup.setPrefHeight(50);
-        signup.setOnAction(handleRegister);
+        signup.setOnAction(e -> handleRegister(username, password, passwordAgain, info));
 
         Label or = new Label("OR");
         or.setFont(new Font(30));
@@ -169,7 +211,7 @@ public class HClient extends Application{
         login.setPrefHeight(50);
         login.setOnAction(e -> stage.setScene(loginScene));
 
-        root.getChildren().addAll(label, spcr1, username, password, passwordAgain, spcr2, signup, or, login);
+        root.getChildren().addAll(label, spcr1, username, password, passwordAgain, info, signup, or, login);
         return scene;
     }
     
